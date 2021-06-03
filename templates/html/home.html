@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,35 +6,9 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}" />
     <title>Find Trending</title>
 </head>
-<style>
-    body,
-    .display {
-        width: 100%;
-        display: flex;
-    }
-
-    h1,
-    form {
-        width: 50%;
-        margin-left: auto;
-    }
-
-    p {
-        font-weight: bold;
-        margin-left: auto;
-    }
-
-    .display div {
-        width: 100%;
-        margin: 0 0 0 100px;
-    }
-
-    th {
-        text-align: center;
-    }
-</style>
 
 <body>
     <div>
