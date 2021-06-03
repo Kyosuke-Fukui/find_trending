@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Trending</title>
+</head>
+<style>
+    body,
+    .display {
+        width: 100%;
+        display: flex;
+    }
+
+    h1,
+    form {
+        width: 50%;
+        margin-left: auto;
+    }
+
+    p {
+        font-weight: bold;
+        margin-left: auto;
+    }
+
+    .display div {
+        width: 100%;
+        margin: 0 0 0 100px;
+    }
+
+    th {
+        text-align: center;
+    }
+</style>
+
+<body>
+    <div>
+        <h1>Find Trending</h1>
+        <form action="{% url 'home' %}" method="POST">
+            <input type="radio" name="country" value="JP" checked>JP
+            <input type="radio" name="country" value="US">US
+            <li>検索ワード　：<input type="text" name="word1" /></li>
+            <li>比較ワード①：<input type="text" name="word2" /></li>
+            <li>比較ワード②：<input type="text" name="word3" /></li>
+            <li>比較ワード③：<input type="text" name="word4" /></li>
+            <li>比較ワード④：<input type="text" name="word5" /></li>
+            <br>
+            {% csrf_token %}
+            <button type="submit">実行</button>
+        </form>
+
+        <div>
+            <img src="data:image/png;base64, {{ graph | safe }} " alt="">
+        </div>
+
+        <div class="display">
+
+            <div>
+                {% if top %}
+                <p>Top related searches</p>
+                {{ top | safe}}
+                {% endif %}
+            </div>
+            <div>
+                {% if rising %}
+                <p>Rising related searches</p>
+                {{ rising | safe}}
+                {% endif %}
+            </div>
+
+        </div>
+
+    </div>
+    <div>
+        {% if trending_jp %}
+        <p>Trending searches (Japan)</p>
+        {{ trending_jp | safe}}
+        {% endif %}
+
+        {% if trending_us %}
+        <p>Trending searches (USA)</p>
+        {{ trending_us | safe}}
+        {% endif %}
+    </div>
+</body>
+
+</html>
