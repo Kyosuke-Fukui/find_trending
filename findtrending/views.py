@@ -3,17 +3,16 @@ import io
 import matplotlib.dates as mdates
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties
 from django.shortcuts import render
 from pytrends.request import TrendReq
-
-plt.rcParams['font.family'] = "MS Gothic"
 
 
 def index(request):
     if request.method == "GET":
         return render(request, "html/home.html")
 
-    # POSTされた場合
+    # フォームからデータがPOSTされた場合
     else:
         if request.POST.get("country", False) == "JP":
             pytrends = TrendReq(hl='ja-jp', tz=540)
@@ -24,13 +23,6 @@ def index(request):
         cat = '0'
         geo = ''
         gprop = ''
-
-        # 急上昇ワード
-        trending_jp = pytrends.trending_searches(
-            'japan').rename(columns={0: 'word'}, index=lambda x: x+1)
-
-        trending_us = pytrends.trending_searches(
-            'united_states').rename(columns={0: 'word'}, index=lambda x: x+1)
 
         word1 = request.POST.get("word1", False)
         word2 = request.POST.get("word2", False)
@@ -52,6 +44,7 @@ def index(request):
 
         # グラフ
         plt.figure(figsize=(10, 8))
+        fontprop = FontProperties(fname='static/fonts/ipag.ttf')
         x_pos = np.arange(len(all_keywords))
 
         # Last 5-years
@@ -64,9 +57,9 @@ def index(request):
         ax1 = plt.subplot2grid((3, 2), (0, 0), rowspan=1, colspan=1)
         ax2 = plt.subplot2grid((3, 2), (0, 1), rowspan=1, colspan=1)
         for kw in all_keywords:
-            ax1.plot(data[kw], label=kw)
+            ax1.plot(data[kw], label=kw, )
         ax2.bar(x_pos, mean, align='center')
-        plt.xticks(x_pos, all_keywords)
+        plt.xticks(x_pos, all_keywords, font_properties=fontprop)
 
         # Last 12-months
         pytrends.build_payload(
@@ -80,7 +73,7 @@ def index(request):
         for kw in all_keywords:
             ax3.plot(data[kw], label=kw)
         ax4.bar(x_pos, mean, align='center')
-        plt.xticks(x_pos, all_keywords)
+        plt.xticks(x_pos, all_keywords, font_properties=fontprop)
 
         # Last 3-months
         pytrends.build_payload(
@@ -93,9 +86,8 @@ def index(request):
         ax6 = plt.subplot2grid((3, 2), (2, 1), rowspan=1, colspan=1)
         for kw in all_keywords:
             ax5.plot(data[kw], label=kw)
-        print(mean)
         ax6.bar(x_pos, mean[0:len(all_keywords)], align='center')
-        plt.xticks(x_pos, all_keywords)
+        plt.xticks(x_pos, all_keywords, font_properties=fontprop)
         # 凡例など
         ax1.set_ylabel('Last 5 years')
         ax3.set_ylabel('Last year')
@@ -104,9 +96,9 @@ def index(request):
         ax2.set_title('Relative average interest for the period', fontsize=14)
         ax3.xaxis.set_major_formatter(mdates.DateFormatter('%m-%y'))
         ax5.xaxis.set_major_formatter(mdates.DateFormatter('%d-%m'))
-        ax1.legend()
-        ax3.legend()
-        ax5.legend()
+        ax1.legend(prop=fontprop)
+        ax3.legend(prop=fontprop)
+        ax5.legend(prop=fontprop)
 
         # グラフをhtmlに描画するための設定
         buffer = io.BytesIO()
@@ -123,6 +115,13 @@ def index(request):
             columns={'query': 'word'}, index=lambda x: x+1)
         rising = data[word1]['rising'].rename(
             columns={'query': 'word'}, index=lambda x: x+1)
+
+        # 急上昇ワード
+        trending_jp = pytrends.trending_searches(
+            'japan').rename(columns={0: 'word'}, index=lambda x: x+1)
+
+        trending_us = pytrends.trending_searches(
+            'united_states').rename(columns={0: 'word'}, index=lambda x: x+1)
 
         return render(
             request,
